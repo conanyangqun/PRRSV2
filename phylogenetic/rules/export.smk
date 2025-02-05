@@ -4,7 +4,7 @@ export a Nextstrain dataset.
 
 REQUIRED INPUTS:
 
-    metadata        = data/metadata.tsv
+    metadata        = data/metadata_all.tsv
     tree            = results/tree.nwk
     branch_lengths  = results/branch_lengths.json
     node_data       = results/*.json
@@ -24,3 +24,33 @@ This part of the workflow usually includes the following steps:
 
 See Augur's usage docs for these commands for more details.
 """
+
+rule export:
+    """Exporting data files for for auspice"""
+    input:
+        tree = "results/tree.nwk",
+        metadata = "data/metadata_all.tsv",
+        branch_lengths = "results/branch_lengths.json",
+        traits = "results/traits.json",
+        nt_muts = "results/nt_muts.json",
+        aa_muts = "results/aa_muts.json",
+        colors = "defaults/colors.tsv",
+        auspice_config = "defaults/auspice_config.json",
+        description = "defaults/description.md"
+    output:
+        auspice_json = "auspice/prrsv2.json"
+    params:
+        strain_id = config.get("strain_id_field", "strain"),
+    shell:
+        """
+        augur export v2 \
+            --tree {input.tree} \
+            --metadata {input.metadata} \
+            --metadata-id-columns {params.strain_id} \
+            --node-data {input.branch_lengths} {input.traits} {input.nt_muts} {input.aa_muts} \
+            --colors {input.colors} \
+            --auspice-config {input.auspice_config} \
+            --description {input.description} \
+            --include-root-sequence-inline \
+            --output {output.auspice_json}
+        """

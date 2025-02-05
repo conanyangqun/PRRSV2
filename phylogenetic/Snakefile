@@ -6,7 +6,7 @@ workflow and defines its default output(s).
 workdir: workflow.current_basedir
 
 # Use default configuration values. Override with Snakemake's --configfile/--config options.
-configfile: "defaults/config.yaml"
+configfile: "defaults/config_prrsv2.yaml"
 
 
 # This is the default rule that Snakemake will run when there are no specified targets.
@@ -17,7 +17,7 @@ configfile: "defaults/config.yaml"
 rule all:
     input:
         # Fill in path(s) to the final exported Auspice JSON(s)
-        auspice_json="",
+        auspice_json="auspice/prrsv2.json",
 
 
 # These rules are imported in the order that they are expected to run.
@@ -31,6 +31,7 @@ rule all:
 # custom_rules imported below to ensure that the core workflow is not complicated
 # by build specific rules.
 include: "rules/prepare_sequences.smk"
+include: "rules/merge_sequences.smk"
 include: "rules/construct_phylogeny.smk"
 include: "rules/annotate_phylogeny.smk"
 include: "rules/export.smk"
